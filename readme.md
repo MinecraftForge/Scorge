@@ -10,5 +10,13 @@ include `modLanguageAdapter = "io.github.illyohs.scorg.ScalaAdapter"` in your @M
 ## Maven repo
 
 ```
-TBD
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+	        compile 'com.github.illyohs:Scorg:@VERSION@'
+	}
 ```
+
+[![](https://jitpack.io/v/illyohs/Scorg.svg)](https://jitpack.io/#illyohs/Scorg)
