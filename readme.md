@@ -1,4 +1,4 @@
-# Scorge
+# Scorg
 A Language adapter for [scala](https://www.scala-lang.org/)
 
 ## Why
