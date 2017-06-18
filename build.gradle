@@ -1,0 +1,100 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+    }
+    dependencies {
+        classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
+    }
+}
+plugins {
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+}
+
+apply plugin: 'scala'
+apply plugin: "net.minecraftforge.gradle.forge"
+
+version = modVersion
+group = modGroup
+archivesBaseName = modBaseName
+
+minecraft {
+    version = project.forgeVersion
+    runDir = "run"
+
+
+    mappings = project.mcpVersion
+
+    useDepAts = true
+}
+
+processResources {
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    // replace stuff in mcmod.info, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include "mcmod.info"
+
+        // replace version and mcversion
+        expand "version": project.version, "mcversion": project.minecraft.version
+    }
+
+    // copy everything else, thats not the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude "mcmod.info"
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.scala-lang:scala-library:2.12.2'
+    compile 'org.scala-lang.modules:scala-parser-combinators_2.12:1.0.6'
+    compile 'org.scala-lang.modules:scala-java8-compat_2.12:0.8.0'
+    compile 'org.scala-lang:scala-reflect:2.12.2'
+
+}
+
+jar {
+    manifest {
+        attributes "FMLCorePlugin": "io.github.illyohs.scorg.preloader.ScorgPlugin",
+                "FMLCorePluginContainsFMLMod": "true"
+    }
+}
+
+shadowJar {
+    classifier = ""
+    dependencies {
+        include(dependency('org.scala-lang:scala-library:2.12.2'))
+        include(dependency('org.scala-lang.modules:scala-parser-combinators_2.12:1.0.6'))
+        include(dependency('org.scala-lang.modules:scala-java8-compat_2.12:0.8.0'))
+        include(dependency('org.scala-lang:scala-reflect:2.12.2'))
+    }
+    manifest {
+        attributes "FMLCorePlugin": "io.github.illyohs.scorg.preloader.ScorgPlugin",
+                "FMLCorePluginContainsFMLMod": "true"
+    }
+}
+
+
+tasks.build.dependsOn shadowJar
+
+artifacts {
+    archives shadowJar
+}
+
+reobf {
+    shadowJar {
+        mappingType = "SEARGE"
+    }
+}
+
+tasks.reobfShadowJar.mustRunAfter shadowJar
+tasks.build.dependsOn reobfShadowJar
