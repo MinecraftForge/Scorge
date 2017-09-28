@@ -20,5 +20,5 @@ package io.github.illyohs.scorg
 
 import net.minecraftforge.fml.common.Mod
 
-@Mod(name = "Scorg", modid = "scorg", version = "1.1.2", acceptableRemoteVersions = "*", acceptedMinecraftVersions = "*", modLanguageAdapter = "io.github.illyohs.scorg.ScalaAdapter")
+@Mod(name = "Scorg", modid = "scorg", version = "1.1.3", acceptableRemoteVersions = "*", acceptedMinecraftVersions = "*", modLanguageAdapter = "io.github.illyohs.scorg.ScalaAdapter")
 object Scorg

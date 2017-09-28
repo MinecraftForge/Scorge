@@ -4,3 +4,4 @@
 /.gradle/
 *.iml
 /out/
+/run
