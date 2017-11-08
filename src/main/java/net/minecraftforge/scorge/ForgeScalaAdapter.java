@@ -167,7 +167,7 @@ public class ForgeScalaAdapter implements ILanguageAdapter
                         setProxy(target, proxyTarget, proxy);
                     }
                     catch (Exception e) {
-                        FMLLog.log.error("An error occurred trying to load a proxy into {}.{}", target.getName(), e);
+                        log.error("An error occurred trying to load a proxy into {}.{}", target.getName(), e);
                         throw new LoaderException(e);
                     }
                 }
@@ -175,7 +175,7 @@ public class ForgeScalaAdapter implements ILanguageAdapter
         }
         else
         {
-            FMLLog.log.trace("Mod does not appear to be a singleton.");
+            log.trace("Mod does not appear to be a singleton.");
         }
     }
 }
