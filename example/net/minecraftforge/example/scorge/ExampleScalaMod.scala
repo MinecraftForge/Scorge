@@ -16,8 +16,31 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package io.github.illyohs.scorg.example
 
-class ExampleServerProxy {
+package net.minecraftforge.scorge.example
 
+@Mod(name = "ExampleScalaMod", modid = "examplescalamod", version = "1.0.0", modLanguageAdapter = "io.github.illyohs.scorg.ScalaAdapter")
+//This must be an object block
+object ExampleScalaMod {
+
+  @Instance("examplescalamod")
+  var instance = this
+
+  @SidedProxy(modId = "examplescalamod", serverSide = "io.github.illyohs.scorg.example.ExampleServerProxy", clientSide = "io.github.illyohs.scorg.example.ExampleServerProxy")
+  var proxy:ExampleServerProxy = null
+
+  @EventHandler
+  def preInit(event:FMLPreInitializationEvent): Unit = {
+
+  }
+
+  @EventHandler
+  def init(event:FMLInitializationEvent): Unit = {
+
+  }
+
+  @EventHandler
+  def postInit(event:FMLPostInitializationEvent): Unit = {
+
+  }
 }

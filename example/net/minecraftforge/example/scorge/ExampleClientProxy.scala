@@ -16,9 +16,8 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package io.github.illyohs.scorg
+package net.minecraftforge.scorge.example
 
-import net.minecraftforge.fml.common.Mod
+class ExampleClientProxy extends ExampleServerProxy {
 
-@Mod(name = "Scorg", modid = "scorg", version = "1.1.3", acceptableRemoteVersions = "*", acceptedMinecraftVersions = "*", modLanguageAdapter = "io.github.illyohs.scorg.ScalaAdapter")
-object Scorg
+}
