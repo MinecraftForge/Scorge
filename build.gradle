@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        mavenLocal()
+//        mavenLocal()
         maven { url = 'http://files.minecraftforge.net/maven' }
         jcenter()
         mavenCentral()
@@ -22,7 +22,7 @@ apply plugin: 'net.minecraftforge.gradle'
 
 repositories {
     mavenCentral()
-    mavenLocal()
+//    mavenLocal()
 //    maven { url ='file://' + file('../repo').absolutePath } //Used by Forge development testing only, you can delete this.
 }
 
@@ -49,7 +49,7 @@ minecraft {
 dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied. 
-    minecraft 'net.minecraftforge:forge:1.13-15.24.0.0-1.13-pre'
+    minecraft 'net.minecraftforge.test:forge:1.13-24.0.52-1.13-pre'
     implementation 'org.scala-lang:scala-library:2.12.7'
 
     // you may put jars on which you depend on in ./libs

@@ -1,4 +1,4 @@
-package net.minecraft.scorge.lang
+package net.minecraftforge.scorge.lang
 
 import java.util.function.Consumer
 
