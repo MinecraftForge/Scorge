@@ -1,27 +1,62 @@
 package net.minecraftforge.scorge.lang
 
-import java.util.function.Consumer
+import java.lang.reflect.InvocationTargetException
+import java.util
+import java.util.function.{Consumer, Supplier}
 
-import net.minecraftforge.fml.LifecycleEventProvider
-import net.minecraftforge.fml.language.IModLanguageProvider.IModLanguageLoader
-import net.minecraftforge.fml.language.{IModInfo, IModLanguageProvider, ModFileScanData}
-import org.apache.logging.log4j.LogManager
+import net.minecraftforge.fml.Logging.LOADING
+import net.minecraftforge.forgespi.language.IModLanguageProvider.IModLanguageLoader
+import net.minecraftforge.forgespi.language.{ILifecycleEvent, IModInfo, IModLanguageProvider, ModFileScanData}
+import net.minecraftforge.scorge.lang.ScorgeModLanguageProvider.ScorgeModTarget
+import org.apache.logging.log4j.{LogManager, Logger}
 
-object ScorgeModLanguageProvider extends IModLanguageProvider{
+import scala.beans.BeanProperty
 
-  private final val LOGGER = LogManager.getLogger
+object ScorgeModLanguageProvider {
 
-  override def name(): String = "scalafml"
+  private val LOGGER = LogManager.getLogger
 
-  override def getFileVisitor: Consumer[ModFileScanData] = ???
-
-  override def preLifecycleEvent(lifecycleEvent: LifecycleEventProvider.LifecycleEvent): Unit = ???
-
-  override def postLifecycleEvent(lifecycleEvent: LifecycleEventProvider.LifecycleEvent): Unit = ???
-
-
-  private class ScorgeModTarget(className:String, modId:String) extends IModLanguageLoader {
-
-    override def loadMod[T](info: IModInfo, modClassLoader: ClassLoader, modFileScanResults: ModFileScanData): T = ???
+  object ScorgeModTarget {
+    private val LOGGER:Logger = ScorgeModLanguageProvider.LOGGER
   }
+
+  class ScorgeModTarget(className:String, @BeanProperty modId:String) extends IModLanguageLoader {
+    override def loadMod[T](info: IModInfo, modClassLoader: ClassLoader, modFileScanResults: ModFileScanData): T = {
+      try {
+
+        val scorgeContainer: Class[_] = Class.forName("net.minecraftforge.scorge.lang.ScorgeModContainer",
+          true, Thread.currentThread().getContextClassLoader)
+        val constructor =scorgeContainer.getConstructor(classOf[IModInfo], classOf[String], classOf[ClassLoader], classOf[ModFileScanData])
+        constructor.newInstance(info, className, modClassLoader, modFileScanResults).asInstanceOf[T]
+      } catch {
+        case e@(_: NoSuchMethodException | _: ClassNotFoundException | _: InstantiationException | _: IllegalAccessException | _: InvocationTargetException) =>
+          LOGGER.fatal(LOADING, "Unable to load ScorgeModContainer, wat?", e:Any)
+          throw new RuntimeException(e)
+      }
+    }
+
+  }
+
+}
+
+//Import for the logger
+import ScorgeModLanguageProvider._
+class ScorgeModLanguageProvider extends IModLanguageProvider{
+
+  override def name(): String = "scorge"
+
+  override def getFileVisitor: Consumer[ModFileScanData] = scanResult => {
+    val targetMap = new util.HashMap[String, ScorgeModTarget]
+    //Scan the mod infos for entryObjects and mod ids
+    scanResult.getIModInfoData.forEach(infos => infos.getMods.forEach(imds => {
+      val modID = imds.getModId
+      val entry = imds.getModProperties.get("entryObject").asInstanceOf[String]
+      LOGGER.debug(LOADING, "Loading mod {} from class entry class {}", modID:Any, entry:Any)
+      targetMap.put(modID, new ScorgeModTarget(entry, modID))
+    }))
+    //Put info into target map
+    scanResult.addLanguageLoader(targetMap)
+  }
+
+  override def consumeLifecycleEvent[R <:ILifecycleEvent[R]](consumeEvent:Supplier[R]): Unit = {}
 }

@@ -1,11 +1,10 @@
-
 /build/
-/.idea/
+.idea/
 /.gradle/
-*.iml
 /out/
 /run
 
+*.iml
 *.ipr
 *.iws
 /bin/
