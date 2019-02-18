@@ -1,16 +1,13 @@
 package net.minecraftforge.scorge.lang
 
-import java.util.Optional
 import java.util.function.Consumer
 
 import net.minecraftforge.eventbus.EventBusErrorMessage
 import net.minecraftforge.eventbus.api.{BusBuilder, Event, IEventBus, IEventListener}
 import net.minecraftforge.fml.LifecycleEventProvider.LifecycleEvent
 import net.minecraftforge.fml._
-import net.minecraftforge.fml.config.ModConfig
-import net.minecraftforge.fml.config.ModConfig.ModConfigEvent
 import net.minecraftforge.forgespi.language.{IModInfo, ModFileScanData}
-import org.apache.logging.log4j.{LogManager, Marker, MarkerManager}
+import org.apache.logging.log4j.{LogManager, MarkerManager}
 
 /**
   *
