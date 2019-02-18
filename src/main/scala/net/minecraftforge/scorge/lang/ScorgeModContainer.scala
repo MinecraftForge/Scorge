@@ -21,9 +21,9 @@ class ScorgeModContainer(info:IModInfo, className:String, mcl:ClassLoader, mfsd:
 
   private final val LOADING = MarkerManager.getMarker("LOADING");
   private final val LOGGER = LogManager.getLogger
-  private final var eventBus:IEventBus = null
-  private var modInstance:Any = _
-  private var modClass:Class[_] = null
+  private final var eventBus:IEventBus = _
+  private var modInstance:AnyRef = _
+  private var modClass:Class[_] = _
 
   triggerMap.put(ModLoadingStage.CONSTRUCT, dummy
     .andThen(this.beforeEvent)
@@ -132,7 +132,7 @@ class ScorgeModContainer(info:IModInfo, className:String, mcl:ClassLoader, mfsd:
     try {
       LOGGER.debug(LOADING, "Loading mod instance {} of type {}", getModId:Any, modClass.getName:Any)
       //TODO I dont like this but the compiler will complain otherwise
-      this.modInstance = modClass.newInstance().asInstanceOf[Any]
+      this.modInstance = modClass.newInstance()
       LOGGER.debug(LOADING, "Loaded mod instance {} of type {}", getModId:Any, modClass.getName:Any)
     } catch {
       case e: Throwable => {
@@ -142,9 +142,9 @@ class ScorgeModContainer(info:IModInfo, className:String, mcl:ClassLoader, mfsd:
     }
   }
 
-  override def matches(mod:Any): Boolean = mod == modInstance
+  override def matches(mod:AnyRef): Boolean = mod == modInstance
 
-  override def getMod:Any = this.modInstance
+  override def getMod:AnyRef = this.modInstance
 
   def getEventBus:IEventBus = this.eventBus
 }
