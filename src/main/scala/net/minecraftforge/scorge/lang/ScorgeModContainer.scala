@@ -22,7 +22,7 @@ class ScorgeModContainer(info:IModInfo, className:String, mcl:ClassLoader, mfsd:
   private final val LOADING = MarkerManager.getMarker("LOADING");
   private final val LOGGER = LogManager.getLogger
   private final var eventBus:IEventBus = null
-  private var modInstance:AnyRef = _
+  private var modInstance:Any = _
   private var modClass:Class[_] = null
 
   triggerMap.put(ModLoadingStage.CONSTRUCT, dummy
@@ -87,7 +87,7 @@ class ScorgeModContainer(info:IModInfo, className:String, mcl:ClassLoader, mfsd:
     LOGGER.debug(LOADING,"Loaded modclass {} with {}", modClass.getName:String, modClass.getClassLoader:Any)
   } catch {
     case e: Throwable =>
-//      LOGGER.error(LOADING, "Failed to load class {}", className, e)
+      LOGGER.error(LOADING, "Failed to load class {}", className:Any, e)
       throw new ModLoadingException(info, ModLoadingStage.CONSTRUCT, "Wut!?!", e)
   }
 
@@ -132,7 +132,7 @@ class ScorgeModContainer(info:IModInfo, className:String, mcl:ClassLoader, mfsd:
     try {
       LOGGER.debug(LOADING, "Loading mod instance {} of type {}", getModId:Any, modClass.getName:Any)
       //TODO I dont like this but the compiler will complain otherwise
-      this.modInstance = modClass.newInstance().asInstanceOf[AnyRef]
+      this.modInstance = modClass.newInstance().asInstanceOf[Any]
       LOGGER.debug(LOADING, "Loaded mod instance {} of type {}", getModId:Any, modClass.getName:Any)
     } catch {
       case e: Throwable => {
@@ -144,7 +144,7 @@ class ScorgeModContainer(info:IModInfo, className:String, mcl:ClassLoader, mfsd:
 
   override def matches(mod:Any): Boolean = mod == modInstance
 
-  override def getMod:AnyRef = this.modInstance
+  override def getMod:Any = this.modInstance
 
   def getEventBus:IEventBus = this.eventBus
 }

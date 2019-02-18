@@ -12,6 +12,7 @@ buildscript {
 plugins {
     id 'org.ajoberstar.grgit' version '2.3.0'
     id "com.github.johnrengelman.shadow" version "4.0.4"
+    id 'maven-publish'
 }
 
 apply plugin: 'scala'
@@ -25,6 +26,7 @@ archivesBaseName = 'Scorge'
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
@@ -85,20 +87,20 @@ processResources {
 
 jar {
     manifest {
-        attributes([
-                'FMLModType': 'LANGPROVIDER'
-        ])
+//        attributes([
+//                'FMLModType': 'LANGPROVIDER'
+//        ])
 
-        attributes(['Specification-Title': 'scorge',
+        attributes(['Specification-Title': 'Mod Language Provider',
                     'Specification-Vendor': 'Forge',
-                    'Specification-Version': '1', // Currently version 1 of the eventbus specification
-                    'Implementation-Title': project.name,
+                    'Specification-Version': '1',
+                    'Implementation-Title': "Scorge",
                     'Implementation-Version': "${version}+${System.getenv("BUILD_NUMBER")?:0}+${grgit.head().abbreviatedId}",
                     'Implementation-Vendor' :'Scorge',
                     'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
                     'Git-Commit': grgit.head().abbreviatedId,
                     'Git-Branch': grgit.branch.current().getName() ],
-                'Scorge/')
+                'net/minecraftforge/scorge/lang/')
     }
 }
 
@@ -112,6 +114,58 @@ shadowJar {
 
 tasks.build.dependsOn shadowJar
 
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
 artifacts {
     archives shadowJar
+    archives sourcesJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            pom {
+                from components.java
+                artifact sourcesJar
+                name = 'Scorge'
+                description = 'The offical Scala language loader for Forge'
+                url = 'https://github.com/MinecraftForge/Scorge/'
+                scm {
+                    url = 'https://github.com/MinecraftForge/Scorge'
+                    connection = 'scm:git:git://github.com/MinecraftForge/scorge.git'
+                    developerConnection = 'scm:git:git@github.com:MinecraftForge/scorge.git'
+                }
+                issueManagement {
+                    system = 'github'
+                    url = 'https://github.com/MinecraftForge/Scorge/issues'
+                }
+
+                licenses {
+                    license {
+                        name = 'LGPLv2.1'
+                        url = 'https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'illyohs'
+                        name = 'Anthony Anderson'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            credentials {
+                username project.properties.forgeMavenUser?:'fake'
+                password project.properties.forgeMavenPassword?:'news'
+            }
+            url "http://files.minecraftforge.net/maven/manage/upload"
+        }
+    }
 }

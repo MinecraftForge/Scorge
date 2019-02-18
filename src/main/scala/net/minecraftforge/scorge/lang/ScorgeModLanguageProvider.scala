@@ -50,7 +50,8 @@ class ScorgeModLanguageProvider extends IModLanguageProvider{
     //Scan the mod infos for entryObjects and mod ids
     scanResult.getIModInfoData.forEach(infos => infos.getMods.forEach(imds => {
       val modID = imds.getModId
-      val entry = imds.getModProperties.get("entryObject").asInstanceOf[String]
+//      val entry = imds.getModProperties.get("entryObject").asInstanceOf[String]
+      val entry = imds.getModConfig.get("entryObject").asInstanceOf[String]
       LOGGER.debug(LOADING, "Loading mod {} from class entry class {}", modID:Any, entry:Any)
       targetMap.put(modID, new ScorgeModTarget(entry, modID))
     }))
