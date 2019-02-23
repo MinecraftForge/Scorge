@@ -5,7 +5,7 @@ import java.util.function.Consumer
 import net.minecraftforge.eventbus.EventBusErrorMessage
 import net.minecraftforge.eventbus.api.{BusBuilder, Event, IEventBus, IEventListener}
 import net.minecraftforge.fml.LifecycleEventProvider.LifecycleEvent
-import net.minecraftforge.fml._
+import net.minecraftforge.fml.{ModContainer, ModLoadingException, ModLoadingStage}
 import net.minecraftforge.forgespi.language.{IModInfo, ModFileScanData}
 import org.apache.logging.log4j.{LogManager, MarkerManager}
 
@@ -25,6 +25,7 @@ class ScorgeModContainer(info:IModInfo, className:String, mcl:ClassLoader, mfsd:
   private var modInstance:AnyRef = _
   private var modClass:Class[_] = _
 
+  LOGGER.debug(LOADING, "Creating ScorgeModContainer instance for {} with classLoader {} & {}", className:Any, mcl:Any, getClass.getClassLoader:Any)
   triggerMap.put(ModLoadingStage.CONSTRUCT, dummy
     .andThen(this.beforeEvent)
     .andThen(this.constructMod)
@@ -84,7 +85,7 @@ class ScorgeModContainer(info:IModInfo, className:String, mcl:ClassLoader, mfsd:
 
   try {
     modClass = Class.forName(className, true, mcl)
-    LOGGER.debug(LOADING,"Loaded modclass {} with {}", modClass.getName:String, modClass.getClassLoader:Any)
+    LOGGER.debug(LOADING,"Loaded modObject {} with {}", modClass.getName:String, modClass.getClassLoader:Any)
   } catch {
     case e: Throwable =>
       LOGGER.error(LOADING, "Failed to load class {}", className:Any, e)
@@ -131,8 +132,9 @@ class ScorgeModContainer(info:IModInfo, className:String, mcl:ClassLoader, mfsd:
   private def constructMod(lifecycleEvent:LifecycleEvent): Unit = {
     try {
       LOGGER.debug(LOADING, "Loading mod instance {} of type {}", getModId:Any, modClass.getName:Any)
-      //TODO I dont like this but the compiler will complain otherwise
-      this.modInstance = modClass.newInstance()
+
+      val modInst = modClass.getField("MODULE$").get(null)
+      this.modInstance = modInst
       LOGGER.debug(LOADING, "Loaded mod instance {} of type {}", getModId:Any, modClass.getName:Any)
     } catch {
       case e: Throwable => {

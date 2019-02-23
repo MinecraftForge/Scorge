@@ -21,7 +21,7 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 version = "${mod_version}"
-group = 'net.minecraftforge.scorge'
+group = 'net.minecraftforge'
 archivesBaseName = 'Scorge'
 
 repositories {
@@ -87,9 +87,9 @@ processResources {
 
 jar {
     manifest {
-//        attributes([
-//                'FMLModType': 'LANGPROVIDER'
-//        ])
+        attributes([
+                'FMLModType': 'LANGPROVIDER'
+        ])
 
         attributes(['Specification-Title': 'Mod Language Provider',
                     'Specification-Vendor': 'Forge',
@@ -114,14 +114,14 @@ shadowJar {
 
 tasks.build.dependsOn shadowJar
 
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
+//task sourcesJar(type: Jar) {
+//    classifier = 'sources'
+//    from sourceSets.main.allSource
+//}
 
 artifacts {
     archives shadowJar
-    archives sourcesJar
+//    archives sourcesJar
 }
 
 publishing {
@@ -129,7 +129,7 @@ publishing {
         mavenJava(MavenPublication) {
             pom {
                 from components.java
-                artifact sourcesJar
+//                artifact sourcesJar shadowJar
                 name = 'Scorge'
                 description = 'The offical Scala language loader for Forge'
                 url = 'https://github.com/MinecraftForge/Scorge/'

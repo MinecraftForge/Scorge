@@ -4,7 +4,6 @@ import java.lang.reflect.InvocationTargetException
 import java.util
 import java.util.function.{Consumer, Supplier}
 
-import net.minecraftforge.fml.Logging.LOADING
 import net.minecraftforge.forgespi.language.IModLanguageProvider.IModLanguageLoader
 import net.minecraftforge.forgespi.language.{ILifecycleEvent, IModInfo, IModLanguageProvider, ModFileScanData}
 import net.minecraftforge.scorge.lang.ScorgeModLanguageProvider.ScorgeModTarget
@@ -14,7 +13,7 @@ import scala.beans.BeanProperty
 
 object ScorgeModLanguageProvider {
 
-  private val LOGGER = LogManager.getLogger
+  private val LOGGER = LogManager.getLogger("Loading")
 
   object ScorgeModTarget {
     private val LOGGER:Logger = ScorgeModLanguageProvider.LOGGER
@@ -30,7 +29,7 @@ object ScorgeModLanguageProvider {
         constructor.newInstance(info, className, modClassLoader, modFileScanResults).asInstanceOf[T]
       } catch {
         case e@(_: NoSuchMethodException | _: ClassNotFoundException | _: InstantiationException | _: IllegalAccessException | _: InvocationTargetException) =>
-          LOGGER.fatal(LOADING, "Unable to load ScorgeModContainer, wat?", e:Any)
+          LOGGER.fatal("Unable to load ScorgeModContainer, wat?", e:Any)
           throw new RuntimeException(e)
       }
     }
@@ -52,8 +51,8 @@ class ScorgeModLanguageProvider extends IModLanguageProvider{
       val modID = imds.getModId
 //      val entry = imds.getModProperties.get("entryObject").asInstanceOf[String]
       val entry = imds.getModConfig.get("entryObject").asInstanceOf[String]
-      LOGGER.debug(LOADING, "Loading mod {} from class entry class {}", modID:Any, entry:Any)
-      targetMap.put(modID, new ScorgeModTarget(entry, modID))
+      LOGGER.debug("Loading mod {} from objectEntry {}", modID:Any, entry:Any)
+      targetMap.put(modID, new ScorgeModTarget(entry+"$", modID))
     }))
     //Put info into target map
     scanResult.addLanguageLoader(targetMap)
