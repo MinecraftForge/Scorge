@@ -33,14 +33,9 @@ pipeline {
         }
         stage('build') {
             steps {
-                sh './gradlew ${GRADLE_ARGS} --refresh-dependencies --continue build'
+                sh './gradlew ${GRADLE_ARGS} --refresh-dependencies'
+                sh './gradlew ${GRADLE_ARGS} build'
 
-            }
-            post {
-                success {
-                    writeChangelog(currentBuild, 'build/changelog.txt')
-                    archiveArtifacts artifacts: 'build/changelog.txt'
-                }
             }
         }
         stage('publish') {
