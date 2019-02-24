@@ -7,6 +7,7 @@ import net.minecraftforge.eventbus.api.{BusBuilder, Event, IEventBus, IEventList
 import net.minecraftforge.fml.LifecycleEventProvider.LifecycleEvent
 import net.minecraftforge.fml.{ModContainer, ModLoadingException, ModLoadingStage}
 import net.minecraftforge.forgespi.language.{IModInfo, ModFileScanData}
+
 import org.apache.logging.log4j.{LogManager, MarkerManager}
 
 /**

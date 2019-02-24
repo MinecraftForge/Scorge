@@ -1,30 +1,30 @@
 # Scorge
-A Language adapter for [scala](https://www.scala-lang.org/)
+A Forge language loader the [Scala](https://www.scala-lang.org/) programming language
 
-## Usage
-include `modLanguageAdapter = "net.minecraftforge.scorge.ForgeScalaAdapter"` in your @Mod annotation
-
-## Maven repo
-
-```
-TBA
-```
 
 ## Supported Scala version
-Current Supported version is 2.11.1
+Current Supported version is 2.12.8
+
+## Shaded libraries
+Scorge currently includes
+* scala-library
+* scala-java8-compat
 
 ## Scala Version Policy
-Scorge will only support the latest major release of scala starting after MC 1.13. That is currently __2.11.1__ it will __not__ support the 
-release candidates or milestone versions.
+Scorge will only support the latest major release of Scala starting once Forge is stabilized for a release. It will lock Scala version till its next stable release. Scorge will __not__ support release candidates or milestone versions of Scala. 
 
-## Scorg library policy
-The current libraries that are shipped with Scorge are meant to keep compatibility with the ones what are currently shipped with Forge excluding these libraries the compiler, xml, continuations, and swing. It was discussed in IRC to drop support for those libraries.
+## Scorge library policy
+
 
 If you want to add a new library for Scorge to support.
-1. It must be made for scala
-2. You must have a good technical to why it would be better supported in Scorge than shipped with your mod
+1. It must be made for Scala
+2. You must have a good technical reason as to why it would be better supported in Scorge instead of being shipped with your mod.
 
 If you want to drop a library supported by Scorge
-1. It must be done during a verion switch of minecraft to not break backwards compatibility within an MC version
-2. You must have a good technical reason as to why it should be done
+1. It must be done during a version switch of minecraft to not break backwards compatibility within an MC version
+2. You must have a good technical reason as to why it should be dropped
 
+## Usage
+
+Follow the exmaple project and __DO NOT__ add Scorge as a maven dependency place it in the mods folder in the the run directory.
+This is due to how language providers are loaded by fml and there's nothing that can be done about this.

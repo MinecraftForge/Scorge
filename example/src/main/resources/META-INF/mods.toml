@@ -1,0 +1,19 @@
+modLoader="scorge" #mandatory
+loaderVersion="[1,)"
+issueTrackerURL="http://my.issue.tracker/"
+
+[[mods]] #mandatory
+    modId="examplescalamod" #mandatory
+    entryObject="com.example.mod"
+    version="${file.jarVersion}" #mandatory
+
+
+displayName="Example scala mod" #mandatory
+updateJSONURL="http://myurl.me/" #optional
+displayURL="http://example.com/" #optional
+logoFile="examplemod.png" #optional
+credits="jeff" #optional
+authors="jeff" #optional
+# The description text for the mod (multi line!) (#mandatory)
+description='''
+'''

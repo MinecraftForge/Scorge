@@ -7,17 +7,14 @@ import java.util.function.{Consumer, Supplier}
 import net.minecraftforge.forgespi.language.IModLanguageProvider.IModLanguageLoader
 import net.minecraftforge.forgespi.language.{ILifecycleEvent, IModInfo, IModLanguageProvider, ModFileScanData}
 import net.minecraftforge.scorge.lang.ScorgeModLanguageProvider.ScorgeModTarget
-import org.apache.logging.log4j.{LogManager, Logger}
+
+import org.apache.logging.log4j.LogManager
 
 import scala.beans.BeanProperty
 
 object ScorgeModLanguageProvider {
 
   private val LOGGER = LogManager.getLogger("Loading")
-
-  object ScorgeModTarget {
-    private val LOGGER:Logger = ScorgeModLanguageProvider.LOGGER
-  }
 
   class ScorgeModTarget(className:String, @BeanProperty modId:String) extends IModLanguageLoader {
     override def loadMod[T](info: IModInfo, modClassLoader: ClassLoader, modFileScanResults: ModFileScanData): T = {
@@ -39,7 +36,7 @@ object ScorgeModLanguageProvider {
 }
 
 //Import for the logger
-import ScorgeModLanguageProvider._
+import net.minecraftforge.scorge.lang.ScorgeModLanguageProvider._
 class ScorgeModLanguageProvider extends IModLanguageProvider{
 
   override def name(): String = "scorge"
@@ -49,7 +46,6 @@ class ScorgeModLanguageProvider extends IModLanguageProvider{
     //Scan the mod infos for entryObjects and mod ids
     scanResult.getIModInfoData.forEach(infos => infos.getMods.forEach(imds => {
       val modID = imds.getModId
-//      val entry = imds.getModProperties.get("entryObject").asInstanceOf[String]
       val entry = imds.getModConfig.get("entryObject").asInstanceOf[String]
       LOGGER.debug("Loading mod {} from objectEntry {}", modID:Any, entry:Any)
       targetMap.put(modID, new ScorgeModTarget(entry+"$", modID))

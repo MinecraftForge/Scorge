@@ -13,20 +13,17 @@ plugins {
     id 'org.ajoberstar.grgit' version '2.3.0'
     id "com.github.johnrengelman.shadow" version "4.0.4"
     id 'maven-publish'
+    id 'scala'
 }
 
-apply plugin: 'scala'
 apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
-version = "${mod_version}"
+version = "${mod_version}+${System.getenv("BUILD_NUMBER")?:0}+${grgit.head().abbreviatedId}"
 group = 'net.minecraftforge'
 archivesBaseName = 'Scorge'
 
 repositories {
     mavenCentral()
-    mavenLocal()
 }
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
@@ -63,7 +60,6 @@ dependencies {
     minecraft "net.minecraftforge:forge:1.13.2-25.0.22"
     implementation "org.scala-lang:scala-library:${scala_lib}"
     implementation "org.scala-lang.modules:scala-java8-compat_${java8_compact}"
-
 }
 
 processResources {
@@ -93,7 +89,7 @@ jar {
 
         attributes(['Specification-Title': 'Mod Language Provider',
                     'Specification-Vendor': 'Forge',
-                    'Specification-Version': '1',
+                    'Specification-Version': '1.0',
                     'Implementation-Title': "Scorge",
                     'Implementation-Version': "${version}+${System.getenv("BUILD_NUMBER")?:0}+${grgit.head().abbreviatedId}",
                     'Implementation-Vendor' :'Scorge',
@@ -114,22 +110,16 @@ shadowJar {
 
 tasks.build.dependsOn shadowJar
 
-//task sourcesJar(type: Jar) {
-//    classifier = 'sources'
-//    from sourceSets.main.allSource
-//}
-
 artifacts {
     archives shadowJar
-//    archives sourcesJar
 }
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        shadow(MavenPublication) { publication ->
+            project.shadow.component(publication)
+
             pom {
-                from components.java
-//                artifact sourcesJar shadowJar
                 name = 'Scorge'
                 description = 'The offical Scala language loader for Forge'
                 url = 'https://github.com/MinecraftForge/Scorge/'
