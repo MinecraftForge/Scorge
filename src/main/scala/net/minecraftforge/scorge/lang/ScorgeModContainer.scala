@@ -133,9 +133,7 @@ class ScorgeModContainer(info:IModInfo, className:String, mcl:ClassLoader, mfsd:
   private def constructMod(lifecycleEvent:LifecycleEvent): Unit = {
     try {
       LOGGER.debug(LOADING, "Loading mod instance {} of type {}", getModId:Any, modClass.getName:Any)
-
-      val modInst = modClass.getField("MODULE$").get(null)
-      this.modInstance = modInst
+      this.modInstance = modClass.newInstance().asInstanceOf[AnyRef]
       LOGGER.debug(LOADING, "Loaded mod instance {} of type {}", getModId:Any, modClass.getName:Any)
     } catch {
       case e: Throwable => {
