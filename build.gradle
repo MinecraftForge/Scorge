@@ -142,7 +142,7 @@ publishing {
 
 def getVersion()
 {
-    String base_number = "${mc_version}-${mod_version}"
+    String base_number = "${mod_version}"
     if (System.hasProperty("BUILD_NUMBER"))
     {
         return base_number + System.getenv("BUILD_NUMBER")
