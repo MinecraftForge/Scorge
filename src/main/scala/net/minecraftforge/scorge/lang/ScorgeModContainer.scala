@@ -1,7 +1,7 @@
 package net.minecraftforge.scorge.lang
 
+// format: off
 import java.util.function.Consumer
-
 import net.minecraftforge.eventbus.EventBusErrorMessage
 import net.minecraftforge.eventbus.api.{BusBuilder, Event, IEventBus, IEventListener}
 import net.minecraftforge.fml.LifecycleEventProvider.LifecycleEvent
@@ -9,6 +9,8 @@ import net.minecraftforge.fml.{ModContainer, ModLoadingException, ModLoadingStag
 import net.minecraftforge.forgespi.language.{IModInfo, ModFileScanData}
 
 import org.apache.logging.log4j.{LogManager, MarkerManager}
+import java.util.Optional
+
 
 /**
   *
@@ -17,6 +19,7 @@ import org.apache.logging.log4j.{LogManager, MarkerManager}
   * @param mcl
   * @param mfsd
   */
+
 class ScorgeModContainer(info:IModInfo, className:String, mcl:ClassLoader, mfsd:ModFileScanData) extends ModContainer(info){
 
 
@@ -79,6 +82,7 @@ class ScorgeModContainer(info:IModInfo, className:String, mcl:ClassLoader, mfsd:
   )
 
   this.eventBus = BusBuilder.builder.setExceptionHandler(this.onEventFailed).setTrackPhases(false).build
+  this.configHandler = Optional.of(event => this.eventBus.post(event))
   final  val context = new ScorgeModLoadingContext(this)
 
   //CPW and his suppliers
@@ -86,7 +90,7 @@ class ScorgeModContainer(info:IModInfo, className:String, mcl:ClassLoader, mfsd:
 
   try {
     modClass = Class.forName(className, true, mcl)
-    LOGGER.debug(LOADING,"Loaded modObject {} with {}", modClass.getName:String, modClass.getClassLoader:Any)
+    LOGGER.debug(LOADING,"Loaded modClass {} with {}", modClass.getName:String, modClass.getClassLoader:Any)
   } catch {
     case e: Throwable =>
       LOGGER.error(LOADING, "Failed to load class {}", className:Any, e)
@@ -149,3 +153,5 @@ class ScorgeModContainer(info:IModInfo, className:String, mcl:ClassLoader, mfsd:
 
   def getEventBus:IEventBus = this.eventBus
 }
+
+// format: on

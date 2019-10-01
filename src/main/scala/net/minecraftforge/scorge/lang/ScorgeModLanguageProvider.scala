@@ -1,5 +1,6 @@
 package net.minecraftforge.scorge.lang
 
+// format: off
 import java.lang.reflect.InvocationTargetException
 import java.util
 import java.util.function.{Consumer, Supplier}
@@ -46,8 +47,8 @@ class ScorgeModLanguageProvider extends IModLanguageProvider{
     //Scan the mod infos for entryObjects and mod ids
     scanResult.getIModInfoData.forEach(infos => infos.getMods.forEach(imds => {
       val modID = imds.getModId
-      val entry = imds.getModConfig.get("entryObject").asInstanceOf[String]
-      LOGGER.debug("Loading mod {} from objectEntry {}", modID:Any, entry:Any)
+      val entry = imds.getModConfig.get("entryClass").asInstanceOf[String]
+      LOGGER.debug("Loading mod {} from entryClass {}", modID:Any, entry:Any)
       targetMap.put(modID, new ScorgeModTarget(entry, modID))
     }))
     //Put info into target map
@@ -56,3 +57,4 @@ class ScorgeModLanguageProvider extends IModLanguageProvider{
 
   override def consumeLifecycleEvent[R <:ILifecycleEvent[R]](consumeEvent:Supplier[R]): Unit = {}
 }
+// format: on

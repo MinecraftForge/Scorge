@@ -4,7 +4,7 @@ issueTrackerURL="http://my.issue.tracker/"
 
 [[mods]] #mandatory
     modId="examplescalamod" #mandatory
-    entryObject="com.example.mod"
+    entryClass="com.example.mod"
     version="${file.jarVersion}" #mandatory
 
 
