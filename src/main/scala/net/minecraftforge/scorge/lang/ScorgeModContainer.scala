@@ -152,6 +152,8 @@ class ScorgeModContainer(info:IModInfo, className:String, mcl:ClassLoader, mfsd:
   override def getMod:AnyRef = this.modInstance
 
   def getEventBus:IEventBus = this.eventBus
+
+  override protected def acceptEvent(e: Event) = getEventBus.post(e)
 }
 
 // format: on
