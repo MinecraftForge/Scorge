@@ -56,7 +56,7 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.14.4-28.1.0'
     implementation "org.scala-lang:scala-library:2.12.7"
     implementation 'net.minecraftforge:Scorge:VERSION'
-
+    //Look Scorge version at maven repo https://files.minecraftforge.net/maven/net/minecraftforge/Scorge/index_default.html
 
 }
 
