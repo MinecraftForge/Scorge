@@ -55,7 +55,7 @@ repositories {
 dependencies {
     minecraft 'net.minecraftforge:forge:1.14.4-28.1.0'
     implementation "org.scala-lang:scala-library:2.12.7"
-    Implementation 'net.minecraftforge:Scorge:VERSION'
+    implementation 'net.minecraftforge:Scorge:VERSION'
 
 
 }
