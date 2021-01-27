@@ -4,24 +4,14 @@ package net.minecraftforge.scorge.lang
 import java.util.function.Consumer
 import net.minecraftforge.eventbus.EventBusErrorMessage
 import net.minecraftforge.eventbus.api.{BusBuilder, Event, IEventBus, IEventListener}
-import net.minecraftforge.fml.LifecycleEventProvider.LifecycleEvent
 import net.minecraftforge.fml.{ModContainer, ModLoadingException, ModLoadingStage}
 import net.minecraftforge.forgespi.language.{IModInfo, ModFileScanData}
 
 import org.apache.logging.log4j.{LogManager, MarkerManager}
 import java.util.Optional
-
-
-/**
-  *
-  * @param info
-  * @param className
-  * @param mcl
-  * @param mfsd
-  */
+import net.minecraftforge.fml.event.lifecycle.IModBusEvent
 
 class ScorgeModContainer(info:IModInfo, className:String, mcl:ClassLoader, mfsd:ModFileScanData) extends ModContainer(info){
-
 
   private final val LOADING = MarkerManager.getMarker("LOADING");
   private final val LOGGER = LogManager.getLogger
@@ -30,60 +20,11 @@ class ScorgeModContainer(info:IModInfo, className:String, mcl:ClassLoader, mfsd:
   private var modClass:Class[_] = _
 
   LOGGER.debug(LOADING, "Creating ScorgeModContainer instance for {} with classLoader {} & {}", className:Any, mcl:Any, getClass.getClassLoader:Any)
-  triggerMap.put(ModLoadingStage.CONSTRUCT, dummy
-    .andThen(this.beforeEvent)
-    .andThen(this.constructMod)
-    .andThen(afterEvent)
-  )
-
-  triggerMap.put(ModLoadingStage.CREATE_REGISTRIES, dummy
-    .andThen(this.beforeEvent)
-    .andThen(this.fireEvent)
-    .andThen(this.afterEvent)
-  )
-
-  triggerMap.put(ModLoadingStage.LOAD_REGISTRIES, dummy
-    .andThen(this.beforeEvent)
-    .andThen(this.fireEvent)
-    .andThen(this.afterEvent)
-  )
-
-  triggerMap.put(ModLoadingStage.COMMON_SETUP, dummy
-    .andThen(this.beforeEvent)
-    .andThen(this.preInitMod)
-    .andThen(this.fireEvent)
-    .andThen(this.afterEvent)
-  )
-
-  triggerMap.put(ModLoadingStage.SIDED_SETUP, dummy
-    .andThen(this.beforeEvent)
-    .andThen(this.fireEvent)
-    .andThen(this.afterEvent)
-  )
-
-  triggerMap.put(ModLoadingStage.ENQUEUE_IMC, dummy
-    .andThen(this.beforeEvent)
-    .andThen(this.initMod)
-    .andThen(this.fireEvent)
-    .andThen(this.afterEvent)
-  )
-
-  triggerMap.put(ModLoadingStage.PROCESS_IMC, dummy
-    .andThen(this.beforeEvent)
-    .andThen(this.fireEvent)
-    .andThen(this.afterEvent)
-  )
-
-  triggerMap.put(ModLoadingStage.COMPLETE, dummy
-    .andThen(this.beforeEvent)
-    .andThen(this.completeLoading)
-    .andThen(this.fireEvent)
-    .andThen(this.afterEvent)
-  )
+  activityMap.put(ModLoadingStage.CONSTRUCT, constructMod _)
 
   this.eventBus = BusBuilder.builder.setExceptionHandler(this.onEventFailed).setTrackPhases(false).build
   this.configHandler = Optional.of(event => this.eventBus.post(event))
-  final  val context = new ScorgeModLoadingContext(this)
+  final val context = new ScorgeModLoadingContext(this)
 
   //CPW and his suppliers
   this.contextExtension = () => context
@@ -97,52 +38,19 @@ class ScorgeModContainer(info:IModInfo, className:String, mcl:ClassLoader, mfsd:
       throw new ModLoadingException(info, ModLoadingStage.CONSTRUCT, "Wut!?!", e)
   }
 
-  private def dummy: Consumer[LifecycleEvent] = _ => {}
-
-  private def completeLoading(lifecycleEvent:LifecycleEvent): Unit = {
-
-  }
-
-  private def initMod(lifecycleEvent:LifecycleEvent): Unit = {
-
-  }
-
   private def onEventFailed(eventBus:IEventBus, event:Event, eventListener:Array[IEventListener], i:Int, throwable:Throwable): Unit = {
     LOGGER.error(new EventBusErrorMessage(event, i, eventListener, throwable):Any)
   }
 
-  private def beforeEvent(lifecycleEvent:LifecycleEvent): Unit = {
-  }
-
-  private def fireEvent(lifecycleEvent:LifecycleEvent): Unit = {
-    val event = lifecycleEvent.getOrBuildEvent(this)
-    LOGGER.debug(LOADING, "Firing event for modid {} : {}", this.getModId:Any, event.getClass.getName:Any)
-
-    try {
-      eventBus.post(event)
-      LOGGER.debug(LOADING, "Fired event for modid {} : {}", this.modId:Any, event.getClass.getName:Any)
-    } catch {
-      case e:Throwable => throw new ModLoadingException(modInfo, lifecycleEvent.fromStage(), "error firing event", e)
-    }
-  }
-
-  private def afterEvent(lifecycleEvent:LifecycleEvent): Unit = {
-    if (getCurrentState == ModLoadingStage.ERROR) {
-      LOGGER.error(LOADING,"An error occurred while dispatching event {} to {}", lifecycleEvent.fromStage:Any, getMod:Any)
-    }
-  }
-
-  private def preInitMod(lifecycleEvent:LifecycleEvent): Unit = {}
-
-  private def constructMod(lifecycleEvent:LifecycleEvent): Unit = {
+  private def constructMod(): Unit = {
     try {
       LOGGER.debug(LOADING, "Loading mod instance {} of type {}", getModId:Any, modClass.getName:Any)
-      this.modInstance = modClass.newInstance().asInstanceOf[AnyRef]
+      this.modInstance = modClass.getDeclaredConstructor().newInstance().asInstanceOf[AnyRef]
       LOGGER.debug(LOADING, "Loaded mod instance {} of type {}", getModId:Any, modClass.getName:Any)
     } catch {
       case e: Throwable => {
         LOGGER.error(LOADING, "Failed to create mod instance. ModId {} for class {}", getModId:Any, modClass.getName:Any, e:Any)
-        throw new ModLoadingException(modInfo, lifecycleEvent.fromStage,"Failed to load mod", e, modClass)
+        throw new ModLoadingException(modInfo, ModLoadingStage.CONSTRUCT,"Failed to load mod", e, modClass)
       }
     }
   }
@@ -153,7 +61,18 @@ class ScorgeModContainer(info:IModInfo, className:String, mcl:ClassLoader, mfsd:
 
   def getEventBus:IEventBus = this.eventBus
 
-  override protected def acceptEvent(e: Event) = getEventBus.post(e)
+  override protected def acceptEvent[T <: Event with IModBusEvent](e: T): Unit = {
+    try {
+      LOGGER.debug(LOADING, "Firing event for modid {} : {}", this.getModId:Any, e:Any)
+      getEventBus.post(e)
+      LOGGER.debug(LOADING, "Fired event for modid {} : {}", this.getModId:Any, e:Any)
+    } catch {
+      case t: Throwable => {
+        LOGGER.error(LOADING,"Caught exception during event {} dispatch for modid {}", e:Any, this.getModId:Any, t:Any);
+        throw new ModLoadingException(modInfo, modLoadingStage, "fml.modloading.errorduringevent", t)
+      }
+    }
+  }
 }
 
 // format: on
