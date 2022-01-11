@@ -26,6 +26,6 @@ If you want to drop a library supported by Scorge
 
 ## Usage
 
-Follow the exmaple project add Scorge as a maven dependency  and place it in the mods folder in the the run directory or
+Follow the example project add Scorge as a maven dependency and place it in the mods folder in the the run directory or
 manually add it to the classpath.
 This is due to how language providers are loaded by fml and there's nothing that can be done about this.
