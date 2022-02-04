@@ -3,12 +3,11 @@ A Forge language loader the [Scala](https://www.scala-lang.org/) programming lan
 
 
 ## Supported Scala version
-Current Supported version is 2.13.4
+Current Supported version is 3.1.1
 
 ## Shaded libraries
 Scorge currently includes
-* scala-library
-* scala-java8-compat
+* scala3-library_3
 
 ## Scala Version Policy
 Scorge will only support the latest major release of Scala starting once Forge is stabilized for a release. It will lock Scala version till its next stable release. Scorge will __not__ support release candidates or milestone versions of Scala. 

@@ -9,28 +9,29 @@ import net.minecraftforge.forgespi.language.{IModInfo, ModFileScanData}
 
 import org.apache.logging.log4j.{LogManager, MarkerManager}
 import java.util.Optional
-import net.minecraftforge.fml.event.lifecycle.IModBusEvent
+import net.minecraftforge.fml.event.IModBusEvent
 
-class ScorgeModContainer(info:IModInfo, className:String, mcl:ClassLoader, mfsd:ModFileScanData) extends ModContainer(info){
+class ScorgeModContainer(info:IModInfo, className:String, mfsd:ModFileScanData, gl: ModuleLayer) extends ModContainer(info){
 
   private final val LOADING = MarkerManager.getMarker("LOADING");
   private final val LOGGER = LogManager.getLogger
   private final var eventBus:IEventBus = _
   private var modInstance:AnyRef = _
-  private var modClass:Class[_] = _
+  private final var modClass:Class[_] = _
 
-  LOGGER.debug(LOADING, "Creating ScorgeModContainer instance for {} with classLoader {} & {}", className:Any, mcl:Any, getClass.getClassLoader:Any)
+  LOGGER.debug(LOADING, "Creating ScorgeModContainer instance for {} with gameLayer {} and classLoader {}", className:Any, gl:Any, getClass.getClassLoader:Any)
   activityMap.put(ModLoadingStage.CONSTRUCT, constructMod _)
 
   this.eventBus = BusBuilder.builder.setExceptionHandler(this.onEventFailed).setTrackPhases(false).build
-  this.configHandler = Optional.of(event => this.eventBus.post(event))
+  this.configHandler = Optional.of(event => this.eventBus.post(event.self))
   final val context = new ScorgeModLoadingContext(this)
 
   //CPW and his suppliers
   this.contextExtension = () => context
 
   try {
-    modClass = Class.forName(className, true, mcl)
+    val layer = gl.findModule(info.getOwningFile.moduleName).orElseThrow;
+    modClass = Class.forName(layer, className)
     LOGGER.debug(LOADING,"Loaded modClass {} with {}", modClass.getName:String, modClass.getClassLoader:Any)
   } catch {
     case e: Throwable =>

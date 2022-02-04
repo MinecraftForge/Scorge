@@ -17,13 +17,12 @@ object ScorgeModLanguageProvider {
   private val LOGGER = LogManager.getLogger("Loading")
 
   class ScorgeModTarget(className:String, @BeanProperty modId:String) extends IModLanguageLoader {
-    override def loadMod[T](info: IModInfo, modClassLoader: ClassLoader, modFileScanResults: ModFileScanData): T = {
+    override def loadMod[T](info: IModInfo, modFileScanResults: ModFileScanData, gameLayer: ModuleLayer): T = {
       try {
-
         val scorgeContainer: Class[_] = Class.forName("net.minecraftforge.scorge.lang.ScorgeModContainer",
           true, Thread.currentThread().getContextClassLoader)
-        val constructor =scorgeContainer.getConstructor(classOf[IModInfo], classOf[String], classOf[ClassLoader], classOf[ModFileScanData])
-        constructor.newInstance(info, className, modClassLoader, modFileScanResults).asInstanceOf[T]
+        val constructor = scorgeContainer.getConstructor(classOf[IModInfo], classOf[String], classOf[ModFileScanData], classOf[ModuleLayer])
+        constructor.newInstance(info, className, modFileScanResults, gameLayer).asInstanceOf[T]
       } catch {
         case e@(_: NoSuchMethodException | _: ClassNotFoundException | _: InstantiationException | _: IllegalAccessException | _: InvocationTargetException) =>
           LOGGER.fatal("Unable to load ScorgeModContainer, wat?", e:Any)
