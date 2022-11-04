@@ -1,31 +1,13 @@
-buildscript {
-    repositories {
-        maven { url 'https://maven.minecraftforge.net/' }
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-    }
-}
-
 plugins {
+    id 'scala'
+    id 'maven-publish'
     id 'org.ajoberstar.grgit' version '4.1.1'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
-    id 'maven-publish'
-    id 'scala'
+    id 'net.minecraftforge.gradle' version '5.1.+'
 }
 
-apply plugin: 'net.minecraftforge.gradle'
 version = getVersion()
 group = 'net.minecraftforge'
-archivesBaseName = 'Scorge'
-
-repositories {
-    mavenCentral()
-    flatDir {
-        dirs 'build/libs'
-    }
-}
 
 java {
     toolchain {
@@ -43,10 +25,10 @@ minecraft {
     // stable_#            stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'official', version: "${mappings_version}"
+    mappings channel: 'official', version: "${mc_version}"
 
     runs {
-        client = {
+        client {
             // recommended logging data for a userdev environment
             properties 'forge.logging.markers': 'REGISTRIES'
             // recommended logging level for the console
@@ -62,7 +44,7 @@ minecraft {
                 }
             }
         }
-        server = {
+        server {
             // recommended logging data for a userdev environment
             properties 'forge.logging.markers': 'REGISTRIES'
             // recommended logging level for the console
@@ -76,32 +58,45 @@ minecraft {
                 scorgetest {
                     source sourceSets.example
                 }
+            }
+        }
+        
+        project.afterEvaluate {
+            // Fix scala's broken module artifacts
+            def path = configurations.minecraftLibrary.resolvedConfiguration
+                    .resolvedArtifacts
+                    .findAll { it.moduleVersion.id.group == 'org.scala-lang' }
+                    .collect { it.file.name }
+                    .join(',')
+            configureEach { run -> 
+                run.property('mergeModules', path)
             }
         }
     }
 }
 
 configurations {
-    library
-    implementation.extendsFrom library
+    shade
+    minecraftLibrary.extendsFrom shade
     exampleImplementation.extendsFrom implementation
 }
 
-minecraft.runs.all {
-    lazyToken('minecraft_classpath') {
-        configurations.library.copyRecursive().resolve().collect { it.absolutePath }.join(File.pathSeparator)
-    }
+repositories {
+    mavenCentral()
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
-    library "org.scala-lang:scala3-library_3:${scala_lib}"
+    
+    shade "org.scala-lang:scala3-library_3:${scala_lib}"
 }
 
 jar {
+    archiveClassifier = 'slim'
     manifest {
         attributes([
-                'FMLModType': 'LANGPROVIDER'
+                'FMLModType': 'LANGPROVIDER',
+                'Automatic-Module-Name': 'scorge'
         ])
 
         attributes(['Specification-Title': 'Mod Language Provider',
@@ -119,16 +114,23 @@ jar {
 
 shadowJar {
     classifier = ''
-    dependencies {
-        include(dependency("org.scala-lang:scala3-library_3:${scala_lib}"))
-    }
+    configurations = [ project.configurations.shade ]
 }
-
-tasks.build.dependsOn shadowJar
 
 artifacts {
     archives shadowJar
 }
+
+tasks.whenTaskAdded {
+    // Fight ForgeGradle and Forge crashing when MOD_CLASSES don't exist
+    if (name == "prepareRuns") {
+        doFirst {
+            sourceSets.main.output.files.forEach(File::mkdirs)
+        }
+    }
+}
+
+tasks.assemble.dependsOn shadowJar
 
 publishing {
     publications {
