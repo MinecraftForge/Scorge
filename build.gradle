@@ -1,7 +1,7 @@
 plugins {
     id 'scala'
     id 'maven-publish'
-    id 'org.ajoberstar.grgit' version '4.1.1'
+    id 'org.ajoberstar.grgit' version '5.0.0-rc.3'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'net.minecraftforge.gradle' version '5.1.+'
 }
@@ -10,9 +10,8 @@ version = getVersion()
 group = 'net.minecraftforge'
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
+    toolchain.languageVersion = JavaLanguageVersion.of(17)
+    withSourcesJar()
 }
 
 sourceSets {
@@ -78,6 +77,7 @@ minecraft {
 configurations {
     shade
     minecraftLibrary.extendsFrom shade
+    apiElements.extendsFrom shade
     exampleImplementation.extendsFrom implementation
 }
 
@@ -92,7 +92,7 @@ dependencies {
 }
 
 jar {
-    archiveClassifier = 'slim'
+    archiveClassifier.set('slim')
     manifest {
         attributes([
                 'FMLModType': 'LANGPROVIDER',
@@ -117,10 +117,6 @@ shadowJar {
     configurations = [ project.configurations.shade ]
 }
 
-artifacts {
-    archives shadowJar
-}
-
 tasks.whenTaskAdded {
     // Fight ForgeGradle and Forge crashing when MOD_CLASSES don't exist
     if (name == "prepareRuns") {
@@ -132,10 +128,15 @@ tasks.whenTaskAdded {
 
 tasks.assemble.dependsOn shadowJar
 
+afterEvaluate {
+    // ShadowRuntimeElements takes care of the runtime variant, we don't need the default one
+    components.java.withVariantsFromConfiguration(configurations.runtimeElements) { skip() }
+}
+
 publishing {
     publications {
-        shadow(MavenPublication) { publication ->
-            project.shadow.component(publication)
+        maven(MavenPublication) { publication ->
+            from components.java
 
             pom {
                 name = 'Scorge'
