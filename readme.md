@@ -1,3 +1,6 @@
+# Archived 
+Archived until futher notice, Scala can be a useful lanuage, but the cost of distributing the scala runtime files has been a major burden on Forge for a long time. Tho I have no intention of removing those files from our servers so that legacy versions can still be used. I also do not have any intentions of ever updating this to newer minecraft versions. Also this hasn't even been updated to 1.20. There are other projects out there that add updated scala as a Forge language loader. Use any of them.
+---
 # Scorge
 A Forge language loader the [Scala](https://www.scala-lang.org/) programming language
 
